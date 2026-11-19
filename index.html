@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פעמיים כי טוב – הזמנת אוכל שבועית</title>
+<meta name="description" content="בישול ביתי טבעוני שבועי · איסוף מקריית שמונה">
+<meta property="og:type" content="website">
+<meta property="og:title" content="פעמיים כי טוב – הזמנת אוכל שבועית">
+<meta property="og:description" content="התפריט של השבוע מחכה לכם. בוחרים מנות ושולחים הזמנה.">
+<meta property="og:image" content="https://diklash1986-collab.github.io/Order/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://diklash1986-collab.github.io/Order/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="img/flower.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#cdbba6; --card:#fffaf4; --brown:#4a3424; --gold:#b0803f; --soft:#f3e6d6; --line:#e2cba8; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--brown); font-family:'Varela Round',Arial,sans-serif; font-size:17px; line-height:1.6; }
+  .wrap { max-width:640px; margin:0 auto; padding:16px 16px 40px; }
+  .card { background:var(--card); border-radius:16px; padding:22px 20px; margin:14px 0; text-align:center; box-shadow:0 2px 10px rgba(74,52,36,.08); }
+  .logo { padding:0; overflow:hidden; } .logo img { width:100%; display:block; }
+  h1 { font-size:26px; margin:0; font-weight:normal; }
+  h2 { font-size:20px; margin:0; font-weight:normal; }
+  .ln { display:block; margin:6px auto 12px; width:150px; }
+  .sub { font-size:15px; color:#7a5c42; margin:-4px 0 10px; }
+  .price { font-size:15px; color:var(--gold); margin-top:2px; }
+  ul.info { list-style:none; padding:0; margin:12px 0 0; } ul.info li { margin:4px 0; }
+  ul.info li::before { content:'•'; color:var(--gold); margin-left:8px; }
+  .contact img { width:220px; max-width:70%; }
+  .flower { text-align:center; margin:4px 0; } .flower img { width:420px; max-width:90%; }
+  input[type=text], input[type=tel], input[type=email], input[type=number], textarea {
+    width:100%; max-width:420px; font:inherit; color:var(--brown); text-align:center;
+    border:none; border-bottom:2px solid var(--line); background:transparent; padding:8px 4px; outline:none; }
+  input:focus, textarea:focus { border-bottom-color:var(--gold); }
+  textarea { min-height:70px; resize:vertical; text-align:right; }
+  .pills { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:4px; }
+  .pill { border:2px solid var(--line); background:#fff; color:var(--brown); border-radius:999px; padding:8px 18px; font:inherit; cursor:pointer; min-width:74px; }
+  .pill.on { background:var(--brown); color:#fff; border-color:var(--brown); }
+  .other { margin-top:12px; display:none; } .other.show { display:block; }
+  .other input { max-width:160px; }
+  .summary { background:var(--soft); text-align:center; }
+  body { padding-bottom:64px; }
+  .bar { position:fixed; bottom:0; left:0; right:0; z-index:5; background:var(--brown); color:#fff; text-align:center; padding:12px 16px; font-size:17px; cursor:pointer; box-shadow:0 -2px 10px rgba(0,0,0,.15); }
+  .loading { text-align:center; padding:40px 10px; }
+  .row { display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px dashed var(--line); text-align:right; }
+  .row:last-child { border-bottom:none; }
+  .total { font-size:22px; margin-top:12px; } .total b { color:var(--brown); }
+  .muted { color:#8a6d55; font-size:15px; }
+  .btn { background:var(--brown); color:#fff; border:none; border-radius:999px; padding:14px 40px; font:inherit; font-size:19px; cursor:pointer; margin-top:6px; }
+  .btn:disabled { opacity:.6; cursor:default; }
+  .err { color:#a3361f; font-size:15px; margin-top:10px; min-height:1em; }
+  .pot img { width:380px; max-width:90%; }
+  .req { color:#a3361f; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="card loading">התפריט נטען...</div></div>
+<script>
+var API = 'https://script.google.com/macros/s/AKfycbwQvTJVPNWGpvhRhosFZfbRWk4efMgXZXQp9xgnSUDdT2cJpbneYJRU0mxTkp7M6w3l/exec';
+var I = { logo:'img/logo.jpg', flower:'img/flower.png', line:'img/line.png', pot:'img/pot.png', contact:'img/contact.png' };
+var M = null;
+var state = { qty:{}, pay:'' };
+
+function el(tag, attrs, kids) {
+  var e = document.createElement(tag);
+  for (var k in (attrs||{})) { if (k=='text') e.textContent = attrs[k]; else if (k=='cls') e.className = attrs[k]; else e.setAttribute(k, attrs[k]); }
+  (kids||[]).forEach(function(c){ if (c) e.appendChild(c); });
+  return e;
+}
+function line() { return el('img', { src:I.line, cls:'ln', alt:'' }); }
+function card(kids, cls) { return el('div', { cls:'card ' + (cls||'') }, kids); }
+function flower() { return el('div', { cls:'flower' }, [el('img', { src:I.flower, alt:'' })]); }
+function fmt(n) { return String(Math.round(n*100)/100); }
+
+function render() {
+  var app = document.getElementById('app'); app.innerHTML = '';
+  app.appendChild(card([el('img', { src:I.logo, alt:'פעמיים כי טוב' })], 'logo'));
+  var ul = el('ul', { cls:'info' }, [
+    el('li', { text:'ההזמנות נסגרות ביום רביעי בשעה 16:00' }),
+    el('li', { text:'איסוף מקריית שמונה: חמישי בערב או שישי בבוקר, בתיאום מראש' }),
+    el('li', { text:'האוכל מגיע בקירור' }),
+    el('li', { text:'מוזמנים להביא כלי אריזה מהבית, כדי לשמור על כדור הארץ' })]);
+  app.appendChild(card([el('h1', { text:'היי לכל הרעבים והרעבות' }), line(), el('div', { text:'לפניכם המנות שניתן להזמין השבוע.' }), ul]));
+  app.appendChild(card([el('img', { src:I.contact, alt:'דקלה · 058-6370216' })], 'contact'));
+
+  app.appendChild(el('div', { style:'height:28px' }));
+  M.dishes.forEach(function (d) {
+    var pills = el('div', { cls:'pills' }), other = el('div', { cls:'other' });
+    var oin = el('input', { type:'number', min:'0.5', step:'0.5', placeholder:'כמה ליטר?' });
+    other.appendChild(oin);
+    [1,2,3,4].forEach(function (n) {
+      var b = el('button', { cls:'pill', type:'button', text:n + ' ליטר' });
+      b.onclick = function () {
+        var on = state.qty[d.id] === n && !other.classList.contains('show');
+        clearPills(pills); other.classList.remove('show');
+        if (on) delete state.qty[d.id]; else { state.qty[d.id] = n; b.classList.add('on'); }
+        update();
+      };
+      pills.appendChild(b);
+    });
+    var ob = el('button', { cls:'pill', type:'button', text:'אחר' });
+    ob.onclick = function () {
+      var on = other.classList.contains('show');
+      clearPills(pills);
+      if (on) { other.classList.remove('show'); delete state.qty[d.id]; }
+      else { other.classList.add('show'); ob.classList.add('on'); oin.focus(); setOther(); }
+      update();
+    };
+    function setOther() { var v = parseFloat(oin.value); if (v > 0) state.qty[d.id] = v; else delete state.qty[d.id]; update(); }
+    oin.oninput = setOther;
+    pills.appendChild(ob);
+    app.appendChild(card([el('h2', { text:d.name }), el('div', { cls:'price', text:d.price + ' ₪ לליטר' }),
+      d.help ? el('div', { cls:'sub', text:d.help }) : null, line(), pills, other]));
+  });
+  app.appendChild(flower());
+
+  app.appendChild(card([el('h2', {}, [document.createTextNode('איך קוראים לך? '), el('span', { cls:'req', text:'*' })]), line(), el('input', { type:'text', id:'name', autocomplete:'name' })]));
+  app.appendChild(card([el('h2', {}, [document.createTextNode('מה הטלפון שלך? '), el('span', { cls:'req', text:'*' })]), line(), el('input', { type:'tel', id:'phone', autocomplete:'tel', placeholder:'050-1234567' })]));
+  app.appendChild(card([el('h2', { text:'מייל לקבלת סיכום ההזמנה' }), line(), el('div', { cls:'sub', text:'לא חובה' }), el('input', { type:'email', id:'email', autocomplete:'email' })]));
+
+  var pp = el('div', { cls:'pills' });
+  M.pays.forEach(function (p) {
+    var b = el('button', { cls:'pill', type:'button', text:p });
+    b.onclick = function () { clearPills(pp); state.pay = p; b.classList.add('on'); update(); };
+    pp.appendChild(b);
+  });
+  app.appendChild(card([el('h2', {}, [document.createTextNode('איך בא לכם לשלם? '), el('span', { cls:'req', text:'*' })]), line(), pp]));
+  app.appendChild(card([el('h2', { text:'יש דברים שאני צריכה לדעת?' }), el('div', { cls:'sub', text:'רגישויות, בקשות מיוחדות' }), line(), el('textarea', { id:'notes' })]));
+
+  app.appendChild(card([el('h2', { text:'סיכום ההזמנה שלך' }), line(), el('div', { id:'sumLines' }), el('div', { id:'sumTotal', cls:'total' })], 'summary'));
+  var btn = el('button', { cls:'btn', id:'send', type:'button', text:'שליחת ההזמנה' });
+  btn.onclick = send;
+  app.appendChild(el('div', { style:'text-align:center' }, [btn, el('div', { cls:'err', id:'err' })]));
+  app.appendChild(card([el('img', { src:I.pot, alt:'מחכה לבשל לכם ולהכיר' })], 'pot'));
+  var bar = el('div', { cls:'bar', id:'bar' });
+  bar.onclick = function () { document.getElementById('sumLines').scrollIntoView({ behavior:'smooth', block:'center' }); };
+  app.appendChild(bar);
+  update();
+}
+
+function clearPills(box) { Array.prototype.forEach.call(box.children, function (c) { c.classList.remove('on'); }); }
+
+function lines() {
+  return M.dishes.filter(function (d) { return state.qty[d.id] > 0; })
+    .map(function (d) { var q = state.qty[d.id]; return { id:d.id, name:d.name, qty:q, price:d.price, sum:q * d.price }; });
+}
+
+function update() {
+  var L0 = lines(), bar = document.getElementById('bar');
+  if (bar) { var tt = 0, ll = 0; L0.forEach(function (l) { tt += l.sum; ll += l.qty; });
+    bar.textContent = L0.length ? 'סיכום ההזמנה: ' + fmt(ll) + ' ליטר · ' + fmt(tt) + ' ₪' : 'סיכום ההזמנה: עוד לא נבחרו מנות'; }
+  var L = lines(), box = document.getElementById('sumLines'), tot = document.getElementById('sumTotal');
+  if (!box) return;
+  box.innerHTML = '';
+  if (!L.length) { box.appendChild(el('div', { cls:'muted', text:'עוד לא נבחרו מנות' })); tot.textContent = ''; return; }
+  var total = 0, liters = 0;
+  L.forEach(function (l) {
+    total += l.sum; liters += l.qty;
+    box.appendChild(el('div', { cls:'row' }, [el('span', { text:l.name + ' · ' + fmt(l.qty) + ' ליטר' }), el('span', { text:fmt(l.sum) + ' ₪' })]));
+  });
+  tot.innerHTML = ''; tot.appendChild(el('div', {}, [document.createTextNode('סה״כ לתשלום: '), el('b', { text:fmt(total) + ' ₪' })]));
+  tot.appendChild(el('div', { cls:'muted', text:'סה״כ ' + fmt(liters) + ' ליטר' }));
+}
+
+function send() {
+  var name = document.getElementById('name').value.trim(), phone = document.getElementById('phone').value.trim();
+  var email = document.getElementById('email').value.trim(), notes = document.getElementById('notes').value.trim();
+  var err = document.getElementById('err'), L = lines();
+  if (!name) return err.textContent = 'נא למלא שם';
+  if (!/^0[0-9\-\s]{8,11}$/.test(phone)) return err.textContent = 'נא למלא מספר טלפון תקין';
+  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err.textContent = 'כתובת המייל לא תקינה';
+  if (!L.length) return err.textContent = 'נא לבחור לפחות מנה אחת';
+  if (!state.pay) return err.textContent = 'נא לבחור איך משלמים';
+  err.textContent = '';
+  var btn = document.getElementById('send'); btn.disabled = true; btn.textContent = 'שולח...';
+  var fail = function () { btn.disabled = false; btn.textContent = 'שליחת ההזמנה'; err.textContent = 'משהו השתבש בשליחה. נסו שוב, או כתבו לדקלה 058-6370216'; };
+  var order = { name:name, phone:phone, email:email, notes:notes, pay:state.pay, items:L.map(function (l) { return { id:l.id, qty:l.qty }; }) };
+  fetch(API, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:JSON.stringify(order) })
+    .then(function (r) { return r.json(); })
+    .then(function (res) { if (res && res.ok) done(name, L); else fail(); })
+    .catch(fail);
+}
+
+function done(name, L) {
+  var app = document.getElementById('app'); app.innerHTML = '';
+  app.appendChild(card([el('img', { src:I.logo, alt:'פעמיים כי טוב' })], 'logo'));
+  var rows = el('div'), total = 0, liters = 0;
+  L.forEach(function (l) { total += l.sum; liters += l.qty;
+    rows.appendChild(el('div', { cls:'row' }, [el('span', { text:l.name + ' · ' + fmt(l.qty) + ' ליטר' }), el('span', { text:fmt(l.sum) + ' ₪' })])); });
+  app.appendChild(card([el('h1', { text:'תודה ' + name + ', ההזמנה התקבלה' }), line(), rows,
+    el('div', { cls:'total' }, [document.createTextNode('סה״כ לתשלום: '), el('b', { text:fmt(total) + ' ₪' })]),
+    el('div', { cls:'muted', text:'סה״כ ' + fmt(liters) + ' ליטר · תשלום ב' + state.pay }),
+    el('div', { style:'margin-top:14px', text:'אחזור אליכם לתיאום האיסוף.' })], 'summary'));
+  app.appendChild(card([el('img', { src:I.pot, alt:'מחכה לבשל לכם ולהכיר' })], 'pot'));
+  window.scrollTo(0, 0);
+}
+
+function isClosed() {
+  var parts = new Intl.DateTimeFormat('en-US', { timeZone:'Asia/Jerusalem', weekday:'short', hour:'numeric', hour12:false }).formatToParts(new Date());
+  var wd = '', h = 0;
+  parts.forEach(function (x) { if (x.type == 'weekday') wd = x.value; if (x.type == 'hour') h = parseInt(x.value, 10) % 24; });
+  if (wd == 'Wed' && h >= 16) return true;
+  if (wd == 'Thu' || wd == 'Fri' || wd == 'Sat') return true;
+  if (wd == 'Sun' && h < 7) return true;
+  return false;
+}
+function showClosed() {
+  var app = document.getElementById('app'); app.innerHTML = '';
+  app.appendChild(card([el('img', { src:I.logo, alt:'פעמיים כי טוב' })], 'logo'));
+  app.appendChild(card([el('h1', { text:'ההזמנות לשבוע הזה נסגרו' }), line(),
+    el('div', { text:'התפריט הבא ייפתח ביום ראשון בבוקר.' }),
+    el('div', { style:'margin-top:10px', text:'לשאלות: דקלה 058-6370216' })]));
+  app.appendChild(card([el('img', { src:I.pot, alt:'מחכה לבשל לכם ולהכיר' })], 'pot'));
+}
+function load(tries) {
+  if (isClosed()) return showClosed();
+  fetch(API + '?api=menu').then(function (r) { return r.json(); }).then(function (d) { M = d.menu; render(); })
+    .catch(function () {
+      if (tries < 2) return setTimeout(function () { load(tries + 1); }, 1500);
+      document.getElementById('app').innerHTML = '<div class="card loading">לא הצלחנו לטעון את התפריט. נסו לרענן את הדף, או כתבו לדקלה 058-6370216</div>';
+    });
+}
+load(0);
+</script>
+</body>
+</html>
