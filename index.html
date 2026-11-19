@@ -217,7 +217,7 @@ function showClosed() {
   app.appendChild(card([el('img', { src:I.pot, alt:'מחכה לבשל לכם ולהכיר' })], 'pot'));
 }
 function load(tries) {
-  if (isClosed()) return showClosed();
+  if (isClosed() && !/preview/.test(location.search)) return showClosed();
   fetch(API + '?api=menu').then(function (r) { return r.json(); }).then(function (d) { M = d.menu; render(); })
     .catch(function () {
       if (tries < 2) return setTimeout(function () { load(tries + 1); }, 1500);
