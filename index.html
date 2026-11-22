@@ -29,6 +29,8 @@
   .ln { display:block; margin:6px auto 12px; width:150px; }
   .sub { font-size:15px; color:#7a5c42; margin:-4px 0 10px; }
   .price { font-size:15px; color:var(--gold); margin-top:2px; }
+  .vg { display:inline-flex; align-items:center; gap:4px; margin:6px 0 2px; padding:2px 10px; border:1.5px solid #6b8e3d; color:#5a7a32; border-radius:999px; font-size:13px; line-height:1.6; }
+  .vg svg { width:14px; height:14px; }
   .intro { text-align:right; } .intro .ln { margin:6px 0 12px; }
   ul.info { list-style:none; padding:0; margin:12px 0 0; } ul.info li { margin:4px 0; }
   ul.info li::before { content:'•'; color:var(--gold); margin-left:8px; }
@@ -114,8 +116,11 @@ function render() {
     function setOther() { var v = parseFloat(oin.value); if (v > 0) state.qty[d.id] = v; else delete state.qty[d.id]; update(); }
     oin.oninput = setOther;
     pills.appendChild(ob);
-    app.appendChild(card([el('h2', { text:d.name }), el('div', { cls:'price', text:d.price + (isBox(d.name) ? ' ₪ לקופסה' : ' ₪ לליטר') }),
-      d.help ? el('div', { cls:'sub', text:d.help }) : null, line(), pills, other]));
+    var vegan = /#vegan/.test(d.help || ''), help = String(d.help || '').replace(/#vegan/g, '').trim();
+    var badge = vegan ? el('span', { cls:'vg', title:'טבעוני' }) : null;
+    if (badge) badge.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14zm0 0l7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>טבעוני';
+    app.appendChild(card([el('h2', { text:d.name }), badge, el('div', { cls:'price', text:d.price + (isBox(d.name) ? ' ₪ לקופסה' : ' ₪ לליטר') }),
+      help ? el('div', { cls:'sub', text:help }) : null, line(), pills, other]));
   });
   app.appendChild(flower());
 
