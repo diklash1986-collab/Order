@@ -22,7 +22,8 @@
   body { margin:0; background:var(--bg); color:var(--brown); font-family:'Varela Round',Arial,sans-serif; font-size:17px; line-height:1.6; }
   .wrap { max-width:640px; margin:0 auto; padding:16px 16px 40px; }
   .card { background:var(--card); border-radius:16px; padding:22px 20px; margin:14px 0; text-align:center; box-shadow:0 2px 10px rgba(74,52,36,.08); }
-  .logo { padding:0; overflow:hidden; } .logo img { width:100%; display:block; }
+  .brand { display:flex; align-items:center; justify-content:center; gap:12px; padding:14px 0 6px; }
+  .brand .bowl { height:34px; } .brand .word { height:30px; max-width:62vw; }
   h1 { font-size:26px; margin:0; font-weight:normal; }
   h2 { font-size:20px; margin:0; font-weight:normal; }
   .ln { display:block; margin:6px auto 12px; width:150px; }
@@ -61,7 +62,7 @@
 <div class="wrap" id="app"><div class="card loading">התפריט נטען...</div></div>
 <script>
 var API = 'https://script.google.com/macros/s/AKfycbwQvTJVPNWGpvhRhosFZfbRWk4efMgXZXQp9xgnSUDdT2cJpbneYJRU0mxTkp7M6w3l/exec';
-var I = { logo:'img/logo.jpg', flower:'img/flower.png', line:'img/line.png', pot:'img/pot.png', contact:'img/contact.png' };
+var I = { bowl:'img/bowl.png', word:'img/wordmark.png', flower:'img/flower.png', line:'img/line.png', pot:'img/pot.png', contact:'img/contact.png' };
 var M = null;
 var state = { qty:{}, pay:'' };
 
@@ -78,7 +79,7 @@ function fmt(n) { return String(Math.round(n*100)/100); }
 
 function render() {
   var app = document.getElementById('app'); app.innerHTML = '';
-  app.appendChild(card([el('img', { src:I.logo, alt:'פעמיים כי טוב' })], 'logo'));
+  app.appendChild(el('div', { cls:'brand' }, [el('img', { src:I.word, cls:'word', alt:'פעמיים כי טוב' }), el('img', { src:I.bowl, cls:'bowl', alt:'' })]));
   var ul = el('ul', { cls:'info' }, [
     el('li', { text:'ההזמנות נסגרות ביום רביעי בשעה 16:00' }),
     el('li', { text:'איסוף מקריית שמונה: חמישי בערב או שישי בבוקר, בתיאום מראש' }),
@@ -191,7 +192,7 @@ function send() {
 
 function done(name, L) {
   var app = document.getElementById('app'); app.innerHTML = '';
-  app.appendChild(card([el('img', { src:I.logo, alt:'פעמיים כי טוב' })], 'logo'));
+  app.appendChild(el('div', { cls:'brand' }, [el('img', { src:I.word, cls:'word', alt:'פעמיים כי טוב' }), el('img', { src:I.bowl, cls:'bowl', alt:'' })]));
   var rows = el('div'), total = 0, liters = 0;
   L.forEach(function (l) { total += l.sum;
     rows.appendChild(el('div', { cls:'row' }, [el('span', { text:l.name + ' · ' + qtyTxt(l) }), el('span', { text:fmt(l.sum) + ' ₪' })])); });
@@ -214,7 +215,7 @@ function isClosed() {
 }
 function showClosed() {
   var app = document.getElementById('app'); app.innerHTML = '';
-  app.appendChild(card([el('img', { src:I.logo, alt:'פעמיים כי טוב' })], 'logo'));
+  app.appendChild(el('div', { cls:'brand' }, [el('img', { src:I.word, cls:'word', alt:'פעמיים כי טוב' }), el('img', { src:I.bowl, cls:'bowl', alt:'' })]));
   app.appendChild(card([el('h1', { text:'ההזמנות לשבוע הזה נסגרו' }), line(),
     el('div', { text:'התפריט הבא ייפתח ביום ראשון בבוקר.' }),
     el('div', { style:'margin-top:10px', text:'לשאלות: דקלה 058-6370216' })]));
