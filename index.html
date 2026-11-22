@@ -29,6 +29,7 @@
   .ln { display:block; margin:6px auto 12px; width:150px; }
   .sub { font-size:15px; color:#7a5c42; margin:-4px 0 10px; }
   .price { font-size:15px; color:var(--gold); margin-top:2px; }
+  .intro { text-align:right; } .intro .ln { margin:6px 0 12px; }
   ul.info { list-style:none; padding:0; margin:12px 0 0; } ul.info li { margin:4px 0; }
   ul.info li::before { content:'•'; color:var(--gold); margin-left:8px; }
   .contact img { width:220px; max-width:70%; }
@@ -82,13 +83,12 @@ function render() {
   app.appendChild(el('div', { cls:'brand' }, [el('img', { src:I.word, cls:'word', alt:'פעמיים כי טוב' }), el('img', { src:I.bowl, cls:'bowl', alt:'' })]));
   var ul = el('ul', { cls:'info' }, [
     el('li', { text:'ההזמנות נסגרות ביום רביעי בשעה 16:00' }),
-    el('li', { text:'איסוף מקריית שמונה: חמישי בערב או שישי בבוקר, בתיאום מראש' }),
+    el('li', { text:'איסוף מקריית שמונה בתיאום מראש' }),
     el('li', { text:'האוכל מגיע בקירור' }),
     el('li', { text:'מוזמנים להביא כלי אריזה מהבית, כדי לשמור על כדור הארץ' })]);
-  app.appendChild(card([el('h1', { text:'היי לכל הרעבים והרעבות' }), line(), el('div', { text:'לפניכם המנות שניתן להזמין השבוע.' }), ul]));
-  app.appendChild(card([el('img', { src:I.contact, alt:'דקלה · 058-6370216' })], 'contact'));
+  app.appendChild(card([el('h1', { text:'היי לכל הרעבים והרעבות' }), line(), el('div', { text:'לפניכם המנות שניתן להזמין השבוע.' }), ul], 'intro'));
 
-  app.appendChild(el('div', { style:'height:28px' }));
+  app.appendChild(el('div', { style:'height:10px' }));
   M.dishes.forEach(function (d) {
     var pills = el('div', { cls:'pills' }), other = el('div', { cls:'other' });
     var oin = el('input', { type:'number', min: isBox(d.name) ? '1' : '0.5', step: isBox(d.name) ? '1' : '0.5', placeholder: isBox(d.name) ? 'כמה קופסאות?' : 'כמה ליטר?' });
