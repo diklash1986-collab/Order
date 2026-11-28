@@ -87,7 +87,7 @@ function render() {
   var app = document.getElementById('app'); app.innerHTML = '';
   app.appendChild(el('div', { cls:'brand' }, [el('img', { src:I.word, cls:'word', alt:'פעמיים כי טוב' }), el('img', { src:I.bowl, cls:'bowl', alt:'' })]));
   var ul = el('ul', { cls:'info' }, [
-    el('li', { text:'ההזמנות נסגרות ביום רביעי בשעה 16:00' }),
+    el('li', { text:'ההזמנות נסגרות ביום רביעי בשעה 10:00' }),
     el('li', { text:'איסוף מקריית שמונה בתיאום מראש' }),
     el('li', { text:'האוכל מגיע בקירור' }),
     el('li', { text:'מוזמנים להביא כלי אריזה מהבית, כדי לשמור על כדור הארץ' })]);
@@ -216,7 +216,7 @@ function isClosed() {
   var parts = new Intl.DateTimeFormat('en-US', { timeZone:'Asia/Jerusalem', weekday:'short', hour:'numeric', hour12:false }).formatToParts(new Date());
   var wd = '', h = 0;
   parts.forEach(function (x) { if (x.type == 'weekday') wd = x.value; if (x.type == 'hour') h = parseInt(x.value, 10) % 24; });
-  if (wd == 'Wed' && h >= 16) return true;
+  if (wd == 'Wed' && h >= 10) return true;
   if (wd == 'Thu' || wd == 'Fri' || wd == 'Sat') return true;
   if (wd == 'Sun' && h < 7) return true;
   return false;
